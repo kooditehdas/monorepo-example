@@ -25,9 +25,13 @@ export function App() {
       <h1>monorepo-example</h1>
       {state.kind === "loading" && <p>Checking the API…</p>}
       {state.kind === "ok" && (
-        <p>
-          API is <strong>{state.status.health}</strong>, version <code>{state.status.version}</code>
-        </p>
+        <>
+          <p>
+            API is <strong>{state.status.health}</strong>, version{" "}
+            <code>{state.status.version}</code>
+          </p>
+          <p>Server time: {state.status.time}</p>
+        </>
       )}
       {state.kind === "error" && <p role="alert">API unavailable: {state.message}</p>}
     </main>

@@ -2,6 +2,8 @@
 export type ApiStatus = {
   health: string;
   version: string;
+  /** The server's current time as an RFC 3339 UTC timestamp. */
+  time: string;
 };
 
 /** GET /api<path> as JSON. The dev server (and production proxy) forwards /api to the Go API. */
@@ -13,11 +15,12 @@ async function getJSON<T>(path: string, signal: AbortSignal | null): Promise<T> 
   return (await res.json()) as T;
 }
 
-/** Health and version of the API, fetched in parallel. */
+/** Health, version and server time of the API, fetched in parallel. */
 export async function fetchStatus(signal: AbortSignal | null = null): Promise<ApiStatus> {
-  const [health, version] = await Promise.all([
+  const [health, version, time] = await Promise.all([
     getJSON<{ status: string }>("/health", signal),
     getJSON<{ version: string }>("/version", signal),
+    getJSON<{ time: string }>("/time", signal),
   ]);
-  return { health: health.status, version: version.version };
+  return { health: health.status, version: version.version, time: time.time };
 }

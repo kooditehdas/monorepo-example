@@ -5,6 +5,7 @@ import (
 	"net/http"
 	"net/http/httptest"
 	"testing"
+	"time"
 )
 
 // do sends a request to the API handler and returns the recorded response.
@@ -67,6 +68,35 @@ func TestVersion(t *testing.T) {
 	}
 }
 
+func TestTime(t *testing.T) {
+	orig := now
+	// A non-UTC clock checks that the handler converts to UTC.
+	now = func() time.Time {
+		return time.Date(2026, 10, 23, 16, 20, 0, 0, time.FixedZone("EEST", 3*60*60))
+	}
+	t.Cleanup(func() { now = orig })
+
+	rec := do(t, New(), http.MethodGet, "/time")
+
+	if rec.Code != http.StatusOK {
+		t.Fatalf("status = %d, want %d", rec.Code, http.StatusOK)
+	}
+	got, ok := decode(t, rec)["time"].(string)
+	if !ok {
+		t.Fatalf(`body["time"] is not a string in %q`, rec.Body.String())
+	}
+	if got != "2026-10-23T13:20:00Z" {
+		t.Errorf(`body["time"] = %q, want "2026-10-23T13:20:00Z"`, got)
+	}
+	parsed, err := time.Parse(time.RFC3339, got)
+	if err != nil {
+		t.Fatalf("time %q is not RFC 3339: %v", got, err)
+	}
+	if parsed.Location() != time.UTC {
+		t.Errorf("time %q is not in UTC", got)
+	}
+}
+
 func TestNotFound(t *testing.T) {
 	tests := []struct {
 		name, method, path string
@@ -75,6 +105,8 @@ func TestNotFound(t *testing.T) {
 		{"unsupported method", http.MethodPost, "/health"},
 		{"unsupported method on version", http.MethodPost, "/version"},
 		{"delete on version", http.MethodDelete, "/version"},
+		{"unsupported method on time", http.MethodPost, "/time"},
+		{"delete on time", http.MethodDelete, "/time"},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
