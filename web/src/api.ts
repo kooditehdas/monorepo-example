@@ -17,7 +17,7 @@ async function getJSON<T>(path: string, signal: AbortSignal | null): Promise<T> 
 
 /** A greeting for name from the API. */
 export async function fetchGreeting(name: string): Promise<string> {
-  const res = await fetch(`/api/greet?name=${name}`);
+  const res = await fetch(`/api/greet?${new URLSearchParams({ name }).toString()}`);
   const body = (await res.json()) as { message: string };
   return body.message;
 }
