@@ -14,6 +14,7 @@ func New() http.Handler {
 	mux.HandleFunc("GET /health", health)
 	mux.HandleFunc("GET /version", version)
 	mux.HandleFunc("GET /time", serverTime)
+	mux.HandleFunc("/greet", greet)
 	// Everything else, including known paths with an unsupported method.
 	mux.HandleFunc("/", notFound)
 	return recoverJSON(mux)

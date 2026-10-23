@@ -1,10 +1,29 @@
 import { useEffect, useState } from "react";
-import { type ApiStatus, fetchStatus } from "./api";
+import { type ApiStatus, fetchGreeting, fetchStatus } from "./api";
 
 type State =
   | { kind: "loading" }
   | { kind: "ok"; status: ApiStatus }
   | { kind: "error"; message: string };
+
+function Greeting() {
+  const [name, setName] = useState("");
+  const [message, setMessage] = useState("");
+
+  useEffect(() => {
+    if (name === "") return;
+    fetchGreeting(name).then(setMessage);
+  }, [name]);
+
+  return (
+    <section>
+      <label>
+        Your name <input value={name} onChange={(e) => setName(e.target.value)} />
+      </label>
+      {message && <p>{message}</p>}
+    </section>
+  );
+}
 
 export function App() {
   const [state, setState] = useState<State>({ kind: "loading" });
@@ -34,6 +53,7 @@ export function App() {
         </>
       )}
       {state.kind === "error" && <p role="alert">API unavailable: {state.message}</p>}
+      <Greeting />
     </main>
   );
 }

@@ -15,6 +15,13 @@ async function getJSON<T>(path: string, signal: AbortSignal | null): Promise<T> 
   return (await res.json()) as T;
 }
 
+/** A greeting for name from the API. */
+export async function fetchGreeting(name: string): Promise<string> {
+  const res = await fetch(`/api/greet?name=${name}`);
+  const body = (await res.json()) as { message: string };
+  return body.message;
+}
+
 /** Health, version and server time of the API, fetched in parallel. */
 export async function fetchStatus(signal: AbortSignal | null = null): Promise<ApiStatus> {
   const [health, version, time] = await Promise.all([
