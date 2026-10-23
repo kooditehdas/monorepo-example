@@ -1,0 +1,8 @@
+# api (web/ has its own .gitignore, which Biome reads)
+/api/server
+/api/bin/
+/api/coverage.out
+# factory and local files
+.factory-out/
+.env
+.DS_Store

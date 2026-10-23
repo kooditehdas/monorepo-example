@@ -1,0 +1,40 @@
+name: Feature
+description: A change for the AI software factory (or a human) to implement.
+labels: []
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Write this so someone new to the codebase could implement it without asking.
+        When it's ready, a maintainer adds **`ai-ready`** (implement directly) or **`ai-plan`** (post a plan first, then wait for `ai-approved`).
+  - type: textarea
+    id: description
+    attributes:
+      label: Description
+      description: What should change, and why?
+    validations:
+      required: true
+  - type: textarea
+    id: acceptance
+    attributes:
+      label: Acceptance criteria
+      description: A checklist the change must satisfy. These become tests.
+      value: |
+        - [ ]
+    validations:
+      required: true
+  - type: textarea
+    id: notes
+    attributes:
+      label: Notes and constraints
+      description: Relevant files, API shapes, things to avoid, out of scope.
+  - type: dropdown
+    id: size
+    attributes:
+      label: Expected size
+      options:
+        - small
+        - medium
+        - large
+    validations:
+      required: true

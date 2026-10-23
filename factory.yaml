@@ -1,0 +1,41 @@
+# Kooditehdas factory settings for this repository.
+# A monorepo lists its packages; each one gets the defaults of its profile in
+# kooditehdas/factory/profiles/<profile>.yaml (commands, toolchain, allowed tools).
+# The agent runs a package's checks with `factory-check <package> <check>`.
+packages:
+  - path: api       # Go HTTP API (go.mod, Go version from it)
+    profile: go
+  - path: web       # React client (Node version from web/.nvmrc)
+    profile: node-ts
+
+model:
+  implement: claude-opus-5-5
+  review: claude-sonnet-5-5
+
+# Cost cap for a single agent run, in USD.
+max_budget_usd: 5
+
+# CI auto-fix attempts per PR before the PR is marked ai-blocked.
+max_fix_attempts: 3
+
+# Total agent runs (implement, fix, respond, review) per issue or PR before it is marked ai-blocked.
+max_agent_runs_per_pr: 10
+
+# The implementer stops and asks for a plan approval instead of coding when a change is larger than this.
+# small | medium | large
+plan_threshold: large
+
+# Changes touching these paths open a draft PR and need explicit human attention.
+protected_paths:
+  - ".github/**"
+  - "factory.yaml"
+  - ".factory/**"
+  - "api/.golangci.yml"
+  - "api/go.sum"
+  - "web/biome.json"
+  - "web/package-lock.json"
+
+review:
+  enabled: true
+  # Also run the automatic AI review on PRs written by people.
+  human_prs: false

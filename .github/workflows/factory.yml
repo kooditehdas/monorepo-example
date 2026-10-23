@@ -1,0 +1,65 @@
+# Kooditehdas factory entry point. Copy to .github/workflows/factory.yml in each app repository.
+# All logic lives in kooditehdas/factory; this file only routes events.
+# Requires org secrets ANTHROPIC_API_KEY, FACTORY_APP_CLIENT_ID and FACTORY_APP_PRIVATE_KEY,
+# and a CI workflow named "CI" in this repository.
+name: Factory
+
+on:
+  issues:
+    types: [labeled, closed]
+  issue_comment:
+    types: [created]
+  pull_request_review_comment:
+    types: [created]
+  pull_request:
+    types: [opened, ready_for_review]
+  workflow_run:
+    workflows: [CI]
+    types: [completed]
+
+permissions: {}
+
+jobs:
+  # Maintainer labels an issue ai-ready / ai-plan / ai-approved.
+  implement:
+    if: >-
+      github.event_name == 'issues' && github.event.action == 'labeled'
+      && contains(fromJSON('["ai-ready", "ai-plan", "ai-approved"]'), github.event.label.name)
+    uses: kooditehdas/factory/.github/workflows/implement.yml@v1
+    secrets: inherit
+
+  # Maintainer comments "@factory <request>" on an issue or a factory PR.
+  respond:
+    if: >-
+      (github.event_name == 'issue_comment' || github.event_name == 'pull_request_review_comment')
+      && github.event.comment.user.type != 'Bot'
+      && startsWith(github.event.comment.body, '@factory')
+      && !startsWith(github.event.comment.body, '@factory review')
+    uses: kooditehdas/factory/.github/workflows/respond.yml@v1
+    secrets: inherit
+
+  # Automatic AI review when a PR opens, or on demand with "@factory review".
+  review:
+    if: >-
+      github.event_name == 'pull_request'
+      || (github.event_name == 'issue_comment'
+          && github.event.issue.pull_request
+          && github.event.comment.user.type != 'Bot'
+          && startsWith(github.event.comment.body, '@factory review'))
+    uses: kooditehdas/factory/.github/workflows/review.yml@v1
+    secrets: inherit
+
+  # Issue closed: remove the factory's transient ai-* labels.
+  cleanup:
+    if: github.event_name == 'issues' && github.event.action == 'closed'
+    uses: kooditehdas/factory/.github/workflows/cleanup.yml@v1
+    secrets: inherit
+
+  # CI failed on a factory branch.
+  ci-fix:
+    if: >-
+      github.event_name == 'workflow_run'
+      && github.event.workflow_run.conclusion == 'failure'
+      && startsWith(github.event.workflow_run.head_branch, 'ai/')
+    uses: kooditehdas/factory/.github/workflows/ci-fix.yml@v1
+    secrets: inherit
