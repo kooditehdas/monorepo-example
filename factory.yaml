@@ -7,6 +7,11 @@ packages:
     profile: go
   - path: web       # React client (Node version from web/.nvmrc)
     profile: node-ts
+    runtime:
+      # Also install the browser for the Playwright tests (replaces the profile's `npm ci`).
+      install: npm ci && npx playwright install --with-deps chromium
+    commands:
+      e2e: npm run test:e2e   # extra check on top of the node-ts profile's
 
 model:
   implement: claude-opus-5-5

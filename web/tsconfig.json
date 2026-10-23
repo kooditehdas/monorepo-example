@@ -13,5 +13,5 @@
     "types": ["vite/client"],
     "noEmit": true
   },
-  "include": ["src", "tests", "*.config.ts"]
+  "include": ["src", "tests", "e2e", "*.config.ts"]
 }

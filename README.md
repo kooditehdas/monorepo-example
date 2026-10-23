@@ -14,7 +14,7 @@ cd api && go run ./cmd/server     # API on :8080
 cd web && npm ci && npm run dev   # client on :5173, /api/* goes to the API
 ```
 
-Checks: in `api/`, `golangci-lint run`, `go vet ./...`, `go test -race ./...`, `go build ./...`. In `web/`, `npm run lint`, `npm run typecheck`, `npm test`, `npm run build`. CI runs each package as its own job (`api`, `web`).
+Checks: in `api/`, `golangci-lint run`, `go vet ./...`, `go test -race ./...`, `go build ./...`. In `web/`, `npm run lint`, `npm run typecheck`, `npm test`, `npm run build`, and the Playwright tests with `npm run test:e2e` (run `npx playwright install chromium` once). CI runs each package as its own job (`api`, `web`).
 
 ## Working with the factory
 
