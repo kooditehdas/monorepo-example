@@ -14,6 +14,7 @@ A small monorepo with two packages that are built and tested separately:
   - `src/api.ts` is the only place that calls the API. It requests `/api/<path>`; the Vite dev server forwards that to the Go API at `localhost:8080` without the `/api` prefix (`vite.config.ts`).
   - `src/App.tsx` renders the page. Components are function components with hooks.
   - Tests live in `web/tests/` and use Vitest, jsdom and Testing Library, with `fetch` stubbed. They never call a real API.
+  - End-to-end tests live in `web/e2e/` and use Playwright (Chromium) against the Vite dev server, with `/api/*` stubbed by `page.route`. They never call a real API either.
 
 A change to an API response shape needs the matching change in `web/src/api.ts` and tests on both sides, in the same PR.
 
@@ -29,6 +30,7 @@ Each package has its own toolchain and commands. Run them inside the package fol
 | Vet / types | `go vet ./...`      | `npm run typecheck` |
 | Test      | `go test -race ./...` | `npm test`          |
 | Build     | `go build ./...`      | `npm run build`     |
+| E2E       | —                     | `npm run test:e2e`  |
 
 All checks of every package you changed must pass before work is considered done. The Node version is in `web/.nvmrc`; the Go version is in `api/go.mod`.
 
@@ -46,6 +48,7 @@ Client (`web/`):
 - TypeScript is strict (`noUncheckedIndexedAccess`, `exactOptionalPropertyTypes`); no `any`.
 - Keep API types in `src/api.ts` next to the calls that use them. Handle loading and error states in the UI.
 - Tests use Testing Library queries by role or text, not CSS selectors, and cover the error path of every API call.
+- A change to what the page shows or how the user interacts with it updates the Playwright tests in `web/e2e/`. They use `getByRole`/`getByText` too.
 - A new npm dependency needs a clear reason stated in the PR.
 
 ## Constraints
